@@ -17,7 +17,14 @@
                (:file "tween-callback" :depends-on ("package"))
                (:file "tween-equations" :depends-on ("package"))
                (:file "tween-manager" :depends-on ("package" "base-tween" "tween" "timeline"))
-               (:file "tween-paths" :depends-on ("package"))))
+               (:file "tween-paths" :depends-on ("package")))
+  :in-order-to ((test-op (test-op #:universal-tween-engine/test))))
+
+(defsystem universal-tween-engine/test
+  :pathname "./test/"
+  :components ((:file "package"))
+  :depends-on (#:alexandria #:parachute #:universal-tween-engine)
+  :perform (test-op (op c) (symbol-call '#:parachute '#:test (find-symbol (symbol-name '#:suite) '#:ute.test))))
 
 (defsystem universal-tween-engine/demo
   :pathname "./demo/"
