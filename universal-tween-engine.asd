@@ -18,3 +18,11 @@
                (:file "tween-equations" :depends-on ("package"))
                (:file "tween-manager" :depends-on ("package" "base-tween" "tween" "timeline"))
                (:file "tween-paths" :depends-on ("package"))))
+
+(defsystem universal-tween-engine/demo
+  :pathname "./demo/"
+  :components ((:file "package"))
+  :depends-on (#:asdf #:alexandria #:universal-tween-engine #:cl-raylib)
+  :build-operation program-op
+  :build-pathname "universal-tween-engine-demo"
+  :entry-point "ute.demo:main")
