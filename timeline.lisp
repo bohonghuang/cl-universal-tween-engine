@@ -91,8 +91,9 @@
 (declaim (ftype (function (base-tween i32 i32 boolean f32)) timeline-update-override))
 (defun timeline-update-override (self step last-step iteration-step-p delta)
   (unless iteration-step-p
-    (let ((dt (if (base-tween-reversep self last-step) (- (+ delta 1.0)) (+ delta 1.0))))
+    (let ((dt (if (base-tween-reversep self last-step) (- delta) (+ delta))))
       (declare (type f32 dt))
+      (incf dt (float-sign dt 1.0))
       (cond
         ((> step last-step)
          (assert (not (minusp delta)))

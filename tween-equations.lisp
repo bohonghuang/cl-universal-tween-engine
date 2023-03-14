@@ -48,7 +48,7 @@
 (declaim (ftype (function (f32) (values f32)) tween-equation-circ-in))
 (defun tween-equation-circ-in (x)
   (declare (type f32 x))
-  (- (- (the f32 (sqrt (- 1.0 (* x x))))) 1.0))
+  (- 1.0 (the f32 (sqrt (- 1.0 (* x x))))))
 
 (declaim (ftype (function (f32) (values f32)) tween-equation-circ-out))
 (defun tween-equation-circ-out (x)
