@@ -1,0 +1,72 @@
+#+TITLE: cl-universal-tween-engine
+This is the [[https://github.com/AurelienRibon/universal-tween-engine][Universal Tween Engine]] ported version for Common Lisp, including some bug fixes for the original version.
+
+[[file:demo/screenshots/easings.gif]]
+
+[[file:demo/screenshots/timeline.gif]]
+* Usage
+The APIs is optimized based on the original Java version to better fit Lisp programming conventions.
+Considering this example from the original Java version:
+
+#+BEGIN_SRC java
+  Timeline.createSequence()
+      .push(Tween.set(myObject, OPACITY).target(0))
+      .push(Tween.set(myObject, SCALE).target(0, 0))
+      .beginParallel()
+           .push(Tween.to(myObject, OPACITY, 0.5f).target(1).ease(Quad.INOUT))
+           .push(Tween.to(myObject, SCALE, 0.5f).target(1, 1).ease(Quad.INOUT))
+      .end()
+      .pushPause(1.0f)
+      .push(Tween.to(myObject, POSITION_X, 0.5f).target(100).ease(Quad.INOUT))
+      .push(Tween.to(myObject, ROTATION, 0.5f).target(360).ease(Quad.INOUT))
+      .repeat(5, 0.5f)
+      .start(myManager);
+#+END_SRC
+
+whose equivalent Lisp code can be:
+
+#+BEGIN_SRC lisp
+  (defstruct object
+    (opacity 0.0 :type single-float)
+    (scale-x 0.0 :type single-float)
+    (scale-y 0.0 :type single-float)
+    (position-x 0.0 :type single-float)
+    (position-y 0.0 :type single-float)
+    (rotation 0.0 :type single-float))
+
+  (let ((my-object (make-object)))
+    (ute:start
+     (ute:timeline
+      (:sequence
+       (:to (((object-opacity my-object)) ; places
+                                          ; waypoints ...
+             (0.0)))                      ; targets
+       (:to (((object-scale-x my-object) (object-scale-y my-object))
+             (0.0 0.0)))
+       (:parallel
+        (:to (((object-opacity my-object))
+              (1.0))
+         :duration 0.5
+         :ease #'ute:quad-inout)
+        (:to (((object-scale-x my-object) (object-scale-y my-object))
+              (1.0 1.0))
+         :duration 0.5
+         :ease #'ute:quad-inout))
+       (:pause 1.0)
+       (:to (((object-position-x my-object))
+             (100.0))
+        :duration 0.5
+        :ease #'ute:quad-inout)
+       (:to (((object-rotation my-object))
+             (360.0))
+        :duration 0.5
+        :ease #'ute:quad-inout))
+      :repeat (:count 5 :delay 0.5))))
+#+END_SRC
+
+For more usage examples, please refer to the [[file:demo/package.lisp][demo]], which requires installation of [[https://github.com/longlene/cl-raylib][cl-raylib]] and can be launched with:
+
+#+BEGIN_SRC lisp
+  (ql:quickload :universal-tween-engine/demo)
+  (ute.demo:main)
+#+END_SRC
