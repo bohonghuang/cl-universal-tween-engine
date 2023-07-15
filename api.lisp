@@ -5,6 +5,8 @@
         (fdefinition 'pausedp) (fdefinition 'base-tween-pausedp)
         (fdefinition 'startedp) (fdefinition 'base-tween-startedp)
         (fdefinition 'finishedp) (fdefinition 'base-tween-finishedp)
+        (fdefinition 'duration) (fdefinition 'base-tween-duration)
+        (fdefinition 'full-duration) (fdefinition 'base-tween-full-duration)
         (fdefinition 'add-child) (fdefinition 'timeline-add-child)
         (fdefinition 'add-waypoint) (fdefinition 'tween-add-waypoint)))
 
@@ -98,6 +100,14 @@
 (loop :for symbol :in +paths+
       :for definition :in +tween-paths+
       :do (setf (fdefinition symbol) (fdefinition definition)))
+
+(deftype callback () 'tween-callback)
+
+(defun callback (tween)
+  (base-tween-callback tween))
+
+(defun (setf callback) (value tween)
+  (setf (base-tween-callback tween) value))
 
 (defconstant +callback-none+ +tween-callback-none+)
 (defconstant +callback-begin+ +tween-callback-begin+)

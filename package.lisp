@@ -48,11 +48,14 @@
    #:pausedp
    #:startedp
    #:finishedp
+   #:duration
+   #:full-duration
    #:+easings+
    #:+paths+
    #:*tween-manager*
    #:tween-manager
    #:make-tween-manager
+   #:callback
    #:callback-type
    #:+callback-begin+
    #:+callback-start+
