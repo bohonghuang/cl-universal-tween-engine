@@ -128,7 +128,7 @@
                    (from nil)
                    (to nil)
                    (path '#'tween-path-catmull-rom)
-                   (ease '#'tween-equation-quad-inout)
+                   (ease ''tween-equation-quad-inout)
                    (delay 0.0)
                    (repeat 0)
                    (relativep nil)
@@ -158,7 +158,7 @@
               (if (and (listp callback) (keywordp (car callback))) callback
                   (list :function callback))
             `(setf (tween-path ,tween) ,path
-                   (tween-equation ,tween) ,ease
+                   (tween-equation ,tween) (ensure-function ,ease)
                    (tween-fromp ,tween) ,(not (null from))
                    (tween-callback ,tween) (or ,function #'values) 
                    (tween-delay ,tween) ,delay
