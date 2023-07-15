@@ -145,14 +145,20 @@
     (with-gensyms (tween values)
       `(let ((,tween (pool-get *tween-pool*)))
          (tween-setup ,tween ,n-places
-                      (lambda (,values) (declare (ignorable ,values)) .
-                              ,(loop :for place :in places
-                                     :for i :of-type u8 :from 0
-                                     :collect `(setf (aref ,values ,i) ,place)))
-                      (lambda (,values) (declare (ignorable ,values)) .
-                              ,(loop :for place :in places
-                                     :for i :of-type u8 :from 0
-                                     :collect `(setf ,place (aref ,values ,i))))
+                      (lambda (,values)
+                        (declare
+                         (ignorable ,values)
+                         (type (simple-array single-float (*)) ,values))
+                        ,@(loop :for place :in places
+                                :for i :of-type u8 :from 0
+                                :collect `(setf (aref ,values ,i) ,place)))
+                      (lambda (,values)
+                        (declare
+                         (ignorable ,values)
+                         (type (simple-array single-float (*)) ,values))
+                        ,@(loop :for place :in places
+                                :for i :of-type u8 :from 0
+                                :collect `(setf ,place (aref ,values ,i))))
                       ,duration)
          ,(destructuring-bind (&key (function '#'values) (triggers '+callback-complete+))
               (if (and (listp callback) (keywordp (car callback))) callback
