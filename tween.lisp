@@ -2,7 +2,7 @@
 
 (defconstant +tween-repeat-infinity+ -1)
 
-(defconstant +tween-combined-attributes-limit+ 3)
+(defconstant +tween-combined-attributes-limit+ 9)
 (defconstant +tween-waypoints-limit+ 3)
 
 (deftype tween-accessor () `(function ((simple-array f32 (*)))))

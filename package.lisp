@@ -2,6 +2,7 @@
   (:use #:cl #:alexandria)
   (:nicknames #:ute)
   (:export
+   #:build
    #:start
    #:pause-all
    #:resume-all

@@ -39,13 +39,13 @@
        (loop :named ,loop-name
              :with ,time := (coerce (get-time) 'single-float)
              :and ,delta := 0.0
-             :when (or (window-should-close) (is-key-pressed +key-q+))
+             :when (or (window-should-close) (is-key-pressed 81))
                :do (throw 'exit nil)
              :when (ute:killedp tween)
                :do (return-from ,loop-name)
              :when (and (ute:startedp tween)
-                        (or (is-key-pressed +key-space+)
-                            (is-mouse-button-down +mouse-button-left+))
+                        (or (is-key-pressed 32)
+                            (is-mouse-button-down 0))
                         (not (or (ute:pausedp tween) (ute:killedp tween))))
                :do (progn
                      (ute:pause ,tween)

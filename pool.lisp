@@ -9,8 +9,8 @@
                          :fill-pointer 0
                          :adjustable t
                          :initial-element nil)
-   :type (array t (*)))
-  (object-creator nil :type (function () t))
+   :type (vector base-tween))
+  (object-creator nil :type (function () base-tween))
   (callback (make-pool-callback) :type pool-callback))
 
 (declaim (ftype (function (pool) t) pool-create))
@@ -19,7 +19,7 @@
 
 (declaim (ftype (function (pool) t) pool-get))
 (defun pool-get (self)
-  (let ((obj (if (zerop (length (pool-objects self)))
+  (let ((obj (if (emptyp (pool-objects self))
                  (pool-create self)
                  (vector-pop (pool-objects self)))))
     (funcall (pool-callback-on-unpool (pool-callback self)) obj)

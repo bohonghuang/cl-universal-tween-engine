@@ -10,6 +10,11 @@
         (fdefinition 'add-child) (fdefinition 'timeline-add-child)
         (fdefinition 'add-waypoint) (fdefinition 'tween-add-waypoint)))
 
+(declaim (ftype (function (base-tween) (values base-tween)) build)
+         (inline build))
+(defun build (tween)
+  (base-tween-build tween) tween)
+
 (declaim (ftype (function (base-tween &optional tween-manager) (values base-tween)) start)
          (inline start))
 (defun start (tween &optional (manager *tween-manager*))
@@ -189,12 +194,13 @@
   (with-gensyms (timeline)
     (destructuring-ecase desc
       (((:tween :timeline) &rest descs)
-       (if (cdr descs)
-           `(,(find-symbol (symbol-name (car desc)) (symbol-package 'timeline)) ,@descs ,@args)
-           `(,@(car descs) ,@args)))
+       (cond
+         ((cdr descs) `(,(find-symbol (symbol-name (car desc)) (symbol-package 'timeline)) ,@descs ,@args))
+         ((listp (car descs)) `(,@(car descs) ,@args))
+         (t (car descs))))
       ((:pause time)
        `(tween :delay ,time))
-      ((:call function)
+      ((:call function &rest args)
        `(tween :callback ,function . ,args))
       (((:from :to) &rest args)
        (declare (ignore args))
@@ -202,8 +208,14 @@
       (((:sequence :parallel) &rest descs)
        `(let ((,timeline (pool-get *timeline-pool*)))
           (timeline-setup ,timeline ,(car desc))
-          ,@(loop :for desc :in descs
-                  :collect `(timeline-add-child ,timeline (timeline ,desc)))
+          ,@(loop :for timeline-args :on descs
+                  :for desc :in descs
+                  :if (keywordp desc)
+                    :do (setf args timeline-args)
+                    :and :return add-children
+                  :else
+                    :collect `(timeline-add-child ,timeline (timeline ,desc)) :into add-children
+                  :finally (return add-children))
           ,@(destructuring-bind (&key (repeat 0) (delay 0.0) (callback '#'values)) args
               `((base-tween-set-repeat ,timeline .
                                        ,(destructuring-bind (&key (count 0) (delay 0.0) (yoyop nil))
