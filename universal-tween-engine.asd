@@ -29,7 +29,7 @@
 (defsystem universal-tween-engine/demo
   :pathname "./demo/"
   :components ((:file "package"))
-  :depends-on (#:asdf #:alexandria #:universal-tween-engine #:cl-raylib)
+  :depends-on (#:asdf #:alexandria #:universal-tween-engine #:claw-raylib)
   :build-operation program-op
   :build-pathname "universal-tween-engine-demo"
   :entry-point "ute.demo:main")

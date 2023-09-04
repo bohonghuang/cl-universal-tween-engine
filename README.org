@@ -64,7 +64,7 @@ whose equivalent Lisp code can be:
       :repeat (:count 5 :delay 0.5))))
 #+END_SRC
 
-For more usage examples, please refer to the [[file:demo/package.lisp][demo]], which requires installation of [[https://github.com/longlene/cl-raylib][cl-raylib]] and can be launched with:
+For more usage examples, please refer to the [[file:demo/package.lisp][demo]], which requires installation of [[https://github.com/bohonghuang/claw-raylib][claw-raylib]] and can be launched with:
 
 #+BEGIN_SRC lisp
   (ql:quickload :universal-tween-engine/demo)
