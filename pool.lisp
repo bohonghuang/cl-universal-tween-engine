@@ -27,9 +27,9 @@
 
 (declaim (ftype (function (pool t)) pool-free))
 (defun pool-free (self obj)
-  (unless (find obj (pool-objects self))
-    (funcall (pool-callback-on-pool (pool-callback self)) obj)
-    (vector-push-extend obj (pool-objects self))))
+  (assert (null (find obj (pool-objects self))))
+  (funcall (pool-callback-on-pool (pool-callback self)) obj)
+  (vector-push-extend obj (pool-objects self)))
 
 (declaim (ftype (function (pool)) pool-clear))
 (defun pool-clear (self)

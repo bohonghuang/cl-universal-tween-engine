@@ -11,8 +11,9 @@
 
 (declaim (ftype (function (tween-manager base-tween)) tween-manager-add))
 (defun tween-manager-add (self object)
-  (unless (find object (tween-manager-objects self))
-    (vector-push-extend object (tween-manager-objects self)))
+  (let ((objects (tween-manager-objects self)))
+    (assert (null (find object objects)))
+    (vector-push-extend object objects))
   (when (base-tween-auto-start-enabled-p object)
     (base-tween-start object)))
 
@@ -33,16 +34,18 @@
 (defun tween-manager-resume (self)
   (setf (tween-manager-pausedp self) nil))
 
+(declaim (ftype (function (base-tween) (values boolean)) tween-manager-object-deletable-p))
+(defun tween-manager-object-deletable-p (object)
+  (let ((finishedp (base-tween-finishedp object))
+        (killedp (base-tween-killedp object)))
+    (when (and (or finishedp killedp) (base-tween-auto-remove-enabled-p object))
+      (when (xor finishedp killedp)
+        (base-tween-free object))
+      t)))
+
 (declaim (ftype (function (tween-manager f32)) tween-manager-update))
 (defun tween-manager-update (self delta)
-  (let ((objects (setf (tween-manager-objects self)
-                       (delete-if (lambda (object)
-                                    (when (and (or (base-tween-finishedp object)
-                                                   (base-tween-killedp object))
-                                               (base-tween-auto-remove-enabled-p object))
-                                      (base-tween-free object)
-                                      (values t)))
-                                  (tween-manager-objects self)))))
+  (let ((objects (setf (tween-manager-objects self) (delete-if #'tween-manager-object-deletable-p (tween-manager-objects self)))))
     (unless (tween-manager-pausedp self)
       (if (minusp delta)
           (loop :for i :downfrom (1- (length objects)) :to 0

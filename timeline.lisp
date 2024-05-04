@@ -19,9 +19,21 @@
 (defmethod base-tween-reset ((self timeline))
   (timeline-reset self))
 
-(defparameter *timeline-pool* (make-pool :object-creator #'make-timeline
-                                         :callback (make-pool-callback :on-pool #'timeline-reset
-                                                                       :on-unpool #'timeline-reset)))
+(defun make-timeline-pool ()
+  (make-pool :object-creator #'make-timeline
+             :callback (make-pool-callback
+                        :on-pool (lambda (timeline)
+                                   (timeline-reset timeline)
+                                   (setf (timeline-finishedp timeline) t
+                                         (timeline-killedp timeline) t))
+                        :on-unpool (lambda (timeline)
+                                     (assert (emptyp (timeline-children timeline)))
+                                     (assert (eq (timeline-callback timeline) #'values))
+                                     (assert (timeline-auto-remove-enabled-p timeline))
+                                     (setf (timeline-finishedp timeline) nil
+                                           (timeline-killedp timeline) nil)))))
+
+(defparameter *timeline-pool* (make-timeline-pool))
 
 (defmacro do-timeline-children (((var self) &key from-end) &body body)
   (with-gensyms (i)

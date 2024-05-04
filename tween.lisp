@@ -63,9 +63,22 @@
 (defmethod base-tween-start ((self tween))
   (tween-start self))
 
-(defparameter *tween-pool* (make-pool :object-creator #'make-tween
-                                      :callback (make-pool-callback :on-pool #'tween-reset
-                                                                    :on-unpool #'tween-reset)))
+(defun make-tween-pool ()
+  (make-pool :object-creator #'make-tween
+             :callback (make-pool-callback
+                        :on-pool (lambda (tween)
+                                   (tween-reset tween)
+                                   (setf (tween-finishedp tween) t
+                                         (tween-killedp tween) t))
+                        :on-unpool (lambda (tween)
+                                     (assert (eq (tween-values-getter tween) #'values))
+                                     (assert (eq (tween-values-setter tween) #'values))
+                                     (assert (eq (tween-callback tween) #'values))
+                                     (assert (tween-auto-remove-enabled-p tween))
+                                     (setf (tween-finishedp tween) nil
+                                           (tween-killedp tween) nil)))))
+
+(defparameter *tween-pool* (make-tween-pool))
 
 (declaim (ftype (function (tween i32 tween-accessor tween-accessor f32)) tween-setup))
 (defun tween-setup (self n getter setter duration)
